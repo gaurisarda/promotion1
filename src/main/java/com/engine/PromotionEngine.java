@@ -100,7 +100,7 @@ public class PromotionEngine {
 
         if(products != null && !products.isEmpty()) {
             for (Product product : products) {
-                String pname = productService.getName(product);//product.getName();
+                String pname = productService.getName(product);
 
                 switch (pname) {
                     case "A":
