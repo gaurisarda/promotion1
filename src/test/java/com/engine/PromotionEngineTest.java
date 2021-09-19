@@ -65,4 +65,26 @@ public class PromotionEngineTest {
         double amount = instance.calculateAmount(order);
         Assertions.assertEquals(0, amount);
     }
+
+    @Test
+    public void calculateAmount_whenPromotion_getTypeEnum_returnsNull_throwsNPE() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("test");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("test", 0);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+
+        when(promotionService.getPromotionByProductName("test")).thenReturn(promotion);
+
+        when(productService.getProductPriceByProductName("test")).thenReturn(Double.valueOf(0));
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            instance.calculateAmount(order);
+        });
+    }
 }
