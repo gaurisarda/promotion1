@@ -87,4 +87,22 @@ public class PromotionEngineTest {
             instance.calculateAmount(order);
         });
     }
+
+    @Test
+    public void calculateAmount_whenValidData_thenReturnValidResult() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("A");
+        products.add(product);
+        order.setProducts(products);
+        when(order.getProducts()).thenReturn(products);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("A", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(50, amount);
+    }
 }
