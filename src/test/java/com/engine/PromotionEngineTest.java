@@ -123,10 +123,36 @@ public class PromotionEngineTest {
         when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.INDIVIDUAL);
 
         when(promotionService.getPromotionByProductName("test")).thenReturn(promotion);
-        when(productService.getName(any())).thenReturn(null);
 
         Assertions.assertThrows(NullPointerException.class, () -> {
             instance.calculateAmount(order);
         });
+    }
+
+    @Test
+    public void calculateAmountIndividual_when_getAmount_returnsNull_throwsNPE() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("test");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("test", 3);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.INDIVIDUAL);
+        Map<String, Integer> map1 = new HashMap<>();
+        map1.put("test", 2);
+        when(promotion.getProductQtyMap()).thenReturn(map1);
+        when(promotion.getAmount()).thenReturn(Double.valueOf(20));
+        when(productService.getProductPriceByProductName("test")).thenReturn(Double.valueOf(15));
+
+        when(promotionService.getPromotionByProductName("test")).thenReturn(promotion);
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(35, amount);
+
     }
 }
