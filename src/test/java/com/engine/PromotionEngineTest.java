@@ -155,4 +155,29 @@ public class PromotionEngineTest {
         Assertions.assertEquals(35, amount);
 
     }
+
+    @Test
+    public void calculateAmountCombination_when_ProductName_test_returnsuccess() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("test");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("test", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.COMBINATION);
+        when(productService.getProductPriceByProductName("test")).thenReturn(Double.valueOf(15));
+
+
+        when(promotionService.getPromotionByProductName("test")).thenReturn(promotion);
+
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(15, amount);
+
+    }
 }
