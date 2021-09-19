@@ -90,24 +90,6 @@ public class PromotionEngineTest {
     }
 
     @Test
-    public void calculateAmount_whenValidData_thenReturnValidResult() {
-        Order order = mock(Order.class);
-        List<Product> products = new ArrayList<>();
-        Product product = mock(Product.class);
-        product.setName("A");
-        products.add(product);
-        order.setProducts(products);
-        when(order.getProducts()).thenReturn(products);
-
-        Map<String, Integer> map = new HashMap<>();
-        map.put("A", 1);
-        doReturn(map).when(instance).getProduct2CountMap(anyList());
-
-        double amount = instance.calculateAmount(order);
-        Assertions.assertEquals(50, amount);
-    }
-
-    @Test
     public void calculateAmountIndividual_when_getProductQtyMap_returnsNull_throwsNPE() {
         Order order = mock(Order.class);
         List<Product> products = new ArrayList<>();
@@ -178,6 +160,112 @@ public class PromotionEngineTest {
 
         double amount = instance.calculateAmount(order);
         Assertions.assertEquals(15, amount);
+
+    }
+
+    @Test
+    public void calculateAmountCombination_when_ProductName_valid_returnsuccess() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("C");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("C", 2);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.COMBINATION);
+        when(productService.getProductPriceByProductName("C")).thenReturn(Double.valueOf(15));
+
+
+        when(promotionService.getPromotionByProductName("C")).thenReturn(promotion);
+
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(30, amount);
+
+    }
+
+    @Test
+    public void calculateAmountCombination_when_CountOfCEqualsCountOfD_returnCombinationAmount() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("C");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("C", 1);
+        map.put("D", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.COMBINATION);
+        when(promotion.getAmount()).thenReturn(Double.valueOf(20));
+        when(productService.getProductPriceByProductName("C")).thenReturn(Double.valueOf(15));
+
+
+        when(promotionService.getPromotionByProductName("C")).thenReturn(promotion);
+
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(20, amount);
+
+    }
+
+    @Test
+    public void calculateAmountCombination_when_CountOfCGreaterThanCountOfD_returnCombinationAmount() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("C");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("C", 2);
+        map.put("D", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.COMBINATION);
+        when(promotion.getAmount()).thenReturn(Double.valueOf(20));
+        when(productService.getProductPriceByProductName("C")).thenReturn(Double.valueOf(15));
+
+
+        when(promotionService.getPromotionByProductName("C")).thenReturn(promotion);
+
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(35, amount);
+
+    }
+
+    @Test
+    public void calculateAmountCombination_when_CountOfCLessThanCountOfD_returnCombinationAmount() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("C");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("C", 2);
+        map.put("D", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.COMBINATION);
+        when(promotion.getAmount()).thenReturn(Double.valueOf(20));
+        when(productService.getProductPriceByProductName("C")).thenReturn(Double.valueOf(30));
+
+
+        when(promotionService.getPromotionByProductName("C")).thenReturn(promotion);
+
+
+        double amount = instance.calculateAmount(order);
+        Assertions.assertEquals(50, amount);
 
     }
 }
