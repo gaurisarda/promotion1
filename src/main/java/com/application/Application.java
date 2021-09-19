@@ -25,7 +25,7 @@ public class Application {
 
         PromotionEngine eng = new PromotionEngine(promotionService, productService);
         double amount = eng.calculateAmount(order1);
-        System.out.println(" Order1 : " + amount);
+        System.out.println(" Order1 : " + order1 +  " Amount : " + amount);
         Order order2 = new Order();
 
         products.add(new Product("A"));
@@ -36,28 +36,28 @@ public class Application {
         products.add(new Product("B"));
         order1.setProducts(products);
         amount = eng.calculateAmount(order1);
-        System.out.println(" Order2 : " + amount);
+        System.out.println(" Order2 : " + order1 +  " Amount : " + amount);
 
         products.add(new Product("D"));
         order1.setProducts(products);
         amount = eng.calculateAmount(order1);
-        System.out.println(" Order3 : " + amount);
-
-        products.add(new Product("C"));
-        products.add(new Product("D"));
-        order1.setProducts(products);
-        amount = eng.calculateAmount(order1);
-        System.out.println(" Order4 : " + amount);
+        System.out.println(" Order3 : " + order1 +  " Amount : " + amount);
 
         products.add(new Product("C"));
+        products.add(new Product("D"));
         order1.setProducts(products);
         amount = eng.calculateAmount(order1);
-        System.out.println(" Order5 : " + amount);
+        System.out.println(" Order4 : " + order1 +  " Amount : " + amount);
+
+        products.add(new Product("C"));
+        order1.setProducts(products);
+        amount = eng.calculateAmount(order1);
+        System.out.println(" Order5 : " + order1 +  " Amount : " + amount);
 
         products.add(new Product("D"));
         products.add(new Product("D"));
         order1.setProducts(products);
         amount = eng.calculateAmount(order1);
-        System.out.println(" Order6 : " + amount);
+        System.out.println(" Order6 : " + order1 +  " Amount : " + amount);
     }
 }

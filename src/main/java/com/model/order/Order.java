@@ -6,6 +6,17 @@ import java.util.List;
 
 public class Order {
     int id;
+
+    @Override
+    public String toString() {
+        StringBuilder listOfProducts =  new StringBuilder();
+        listOfProducts.append("List of products: ");
+        for (Product product : products){
+            listOfProducts.append(" ").append(product.getName());
+        }
+        return  listOfProducts.toString();
+    }
+
     List<Product> products;
 
     public int getId() {
