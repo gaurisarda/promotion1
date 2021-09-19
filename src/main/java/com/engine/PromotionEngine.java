@@ -11,6 +11,14 @@ import java.util.*;
 
 public class PromotionEngine {
 
+    private final PromotionService promotionService;
+    private final ProductService productService;
+
+    public PromotionEngine(PromotionService promotionService, ProductService productService){
+        this.promotionService = promotionService;
+        this.productService = productService;
+    }
+    
     public double calculateAmount(Order order){
         // get Map of Product and qty
 
@@ -21,18 +29,20 @@ public class PromotionEngine {
         Set<String> productNames = product2CountMap.keySet();
         double totalAmount = 0;
         for (String key : productNames) {
-            Promotion promotion = new PromotionService().getPromotionByProductName(key);
-            PromotionTypeEnum typeEnum = promotion.getTypeEnum();
-            if (typeEnum.equals(PromotionTypeEnum.INDIVIDUAL)) {
+            Promotion promotion = promotionService.getPromotionByProductName(key);
+            PromotionTypeEnum typeEnum  =  promotion.getTypeEnum();
+            if(typeEnum.equals(PromotionTypeEnum.INDIVIDUAL)){
                 // calculate individual amount
-                totalAmount = calculateIndividualAmount();
-            } else {
-                if (key.equals("C")) {
-                    // calculate Combined Amount
-                    totalAmount = calculateCombinedAmount();
+                totalAmount = calculateIndividualAmount(product2CountMap, totalAmount, key, promotion);
+            }
+            else {
+                if(key.equals("C")){
+                    //calculate combined amount
+                    totalAmount = calculateCombinedAmount(product2CountMap, productNames, totalAmount, key, promotion);
                     break;
-                } else {
-                    // do something
+                }
+                else {
+                    totalAmount += product2CountMap.get(key) * productService.getProductPriceByProductName(key);
                 }
             }
         }
@@ -40,12 +50,48 @@ public class PromotionEngine {
         return totalAmount;
     }
 
-    private double calculateCombinedAmount() {
-       return 0;
+    /**
+     *
+     * Compare Count of C and D and check 3 different combinations
+     * 1. If C == D
+     * 2. If C > D
+     * 3. If C < D
+     *
+     */
+    private double calculateCombinedAmount(Map<String, Integer> product2CountMap, Set<String> productNames, double totalAmount, String key, Promotion promotion) {
+        double productPrice4Key = productService.getProductPriceByProductName(key);
+        if(productNames.contains("D")){
+            int countOfC = product2CountMap.get(key);
+            int countOfD = product2CountMap.get("D");
+            double promotionAmount = promotion.getAmount();
+
+            if(countOfC == countOfD){
+                totalAmount += countOfC * promotionAmount;
+            }
+            else {
+                if(countOfC > countOfD){
+                    totalAmount += countOfD * promotionAmount;
+                    totalAmount += (countOfC - countOfD) * productPrice4Key;
+                }
+                else{
+                    totalAmount += countOfC * promotionAmount;
+                    totalAmount += (countOfD - countOfC) * productService.getProductPriceByProductName("D");
+                }
+            }
+        }
+        else {
+            totalAmount += product2CountMap.get(key) * productPrice4Key;
+        }
+        return totalAmount;
     }
 
-    private double calculateIndividualAmount() {
-        return 0;
+    private double calculateIndividualAmount(Map<String, Integer> product2CountMap, double totalAmount, String key, Promotion promotion) {
+        int totalCount = product2CountMap.get(key);
+        int promoCount = promotion.getProductQtyMap().get(key);
+        double promoAmount =  promotion.getAmount();
+        totalAmount += (totalCount / promoCount) * promoAmount;
+        totalAmount += (totalCount % promoCount) * productService.getProductPriceByProductName(key);
+        return totalAmount;
     }
 
     public Map<String, Integer> getProduct2CountMap(List<Product> products) {
@@ -54,7 +100,7 @@ public class PromotionEngine {
 
         if(products != null && !products.isEmpty()) {
             for (Product product : products) {
-                String pname = new ProductService().getName(product);//product.getName();
+                String pname = productService.getName(product);//product.getName();
 
                 switch (pname) {
                     case "A":
