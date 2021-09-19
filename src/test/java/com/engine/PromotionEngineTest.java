@@ -1,5 +1,6 @@
 package test.java.com.engine;
 
+import main.java.com.constant.PromotionTypeEnum;
 import main.java.com.engine.PromotionEngine;
 import main.java.com.model.order.Order;
 import main.java.com.model.product.Product;
@@ -104,5 +105,28 @@ public class PromotionEngineTest {
 
         double amount = instance.calculateAmount(order);
         Assertions.assertEquals(50, amount);
+    }
+
+    @Test
+    public void calculateAmountIndividual_when_getProductQtyMap_returnsNull_throwsNPE() {
+        Order order = mock(Order.class);
+        List<Product> products = new ArrayList<>();
+        Product product = mock(Product.class);
+        product.setName("test");
+        products.add(product);
+
+        Map<String, Integer> map = new HashMap<>();
+        map.put("test", 1);
+        doReturn(map).when(instance).getProduct2CountMap(anyList());
+
+        Promotion promotion = mock(Promotion.class);
+        when(promotion.getTypeEnum()).thenReturn(PromotionTypeEnum.INDIVIDUAL);
+
+        when(promotionService.getPromotionByProductName("test")).thenReturn(promotion);
+        when(productService.getName(any())).thenReturn(null);
+
+        Assertions.assertThrows(NullPointerException.class, () -> {
+            instance.calculateAmount(order);
+        });
     }
 }
